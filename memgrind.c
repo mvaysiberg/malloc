@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 #include "mymalloc.h"
 
-double calcMean(long[] runtime) {
+double calcMean(long runtime[]) {
 	double sum = 0;
 	for (int i = 0; i < 50; i++){
 		sum += runtime[i];
@@ -103,6 +103,6 @@ int main(int argc, char* argv[]) {
         runtime[4][j] = end.tv_usec - start.tv_usec;
     }
 	for (int i = 0; i < 5; i++) {
-        printf(“Avg runtime of task %d: %lf microsecs”, i, calcMean(runtime[i]));
+        printf("Avg runtime of task %d: %lf microsecs", i, calcMean(runtime[i]));
     }
 }

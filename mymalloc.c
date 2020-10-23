@@ -14,14 +14,14 @@ char* nextMeta(char* start, size_t size){
 }
 
 void insertMetadata(char* start, size_t size, char use){
-    short* blockSize = start;
+    short* blockSize = (short*)start;
     *blockSize = size;
-    char* inUse = blockSize + 1;
+    char* inUse = (char*)(blockSize + 1);
     *inUse = use;
 }
 
 void* insertData(char* start, size_t size){
-    short* blockSize = start;
+    short* blockSize = (short*)start;
     //inserting metadata for leftover unused space after allocating enough for the insert block
     if (*blockSize != size){
         insertMetadata(start + metadataSize + size, *blockSize - metadataSize - size, 0);
@@ -39,18 +39,18 @@ void * mymalloc(size_t size, char* file, int line){
     }
     char* ptr = myBlock;
     while (ptr != NULL){
-        short* blockSize = ptr;
-        char* inUse = blockSize + 1;
+        short* blockSize = (short*)ptr;
+        char* inUse = (char*)(blockSize + 1);
         //find the first block with enough available space
         if (*blockSize >= size && *inUse == 0){
             //if the remaining space in the original blockSize does not have enough space for metadataSize and unused space,
             //allocate the entire blockSize for the data to be inserted
             if (*blockSize - size - metadataSize <= 0){
-                return insertData(blockSize, *blockSize);
+                return insertData(ptr, *blockSize);
             }
-            return insertData(blockSize, size);
+            return insertData(ptr, size);
         }
-        ptr = nextMeta(blockSize, *blockSize);
+        ptr = nextMeta(ptr, *blockSize);
     }
     //could not find a block with enough space
     printf("Out of space on line %d in file %s", line, file);
@@ -58,8 +58,8 @@ void * mymalloc(size_t size, char* file, int line){
 }
 
 void mergeLeft(char* prev, char* cur){
-    short* prevSize = prev;
-    short* curSize = cur;
+    short* prevSize = (short*)prev;
+    short* curSize = (short*)cur;
     *prevSize += *curSize + metadataSize;
 }
 

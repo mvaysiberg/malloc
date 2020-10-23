@@ -5,4 +5,5 @@ mymalloc.o: mymalloc.c
 	gcc -c mymalloc.c
 
 clean:
-	rm memgrind *.o
+	rm memgrind 
+	rm *.o
