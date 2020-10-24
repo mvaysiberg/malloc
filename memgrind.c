@@ -13,8 +13,10 @@ double calcMean(long runtime[]) {
 
 int main(int argc, char* argv[]) {
 	struct timeval start, end;
+    const size_t metadataSize = sizeof(short) + 1;
 	long runtime[5][50];
-    for(int j = 0; j < 1; j++) { //change to 50
+    for(int j = 0; j < 50; j++) {
+    
         //A Workload
         gettimeofday(&start,NULL);
         for(int i = 0; i < 120; i++) {
@@ -35,7 +37,7 @@ int main(int argc, char* argv[]) {
         }
         gettimeofday(&end,NULL);
         runtime[1][j] = end.tv_usec - start.tv_usec;
-        
+
         //C Workload
         gettimeofday(&start,NULL);
         int numMalloc = 0;
@@ -64,7 +66,6 @@ int main(int argc, char* argv[]) {
 
         //D Workload
         gettimeofday(&start,NULL);
-        const size_t metadataSize = sizeof(short) + 1;
         char* d = malloc(4096 - metadataSize - 1);
         //D error: Saturation of dynamic memory
         char* e = malloc(1);
@@ -87,21 +88,22 @@ int main(int argc, char* argv[]) {
 
         free(g);
         free(h); // left merge
-        //printf(“%u”, *((short*)(f+200))); //should print 400+ metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 400+ metadataSize
 
         //test insert with newly freed space
         char* k = malloc(300 + metadataSize);
-        //printf(“%u”, *((short*)(f+200))); //should print 300+ metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 300+ metadataSize
 
         free(k); // right merge 
-        //printf(“%u”, *((short*)(f+200))); //should print 400 + metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 400 + metadataSize
 
         free(i); // left and right merge
-        //printf(“%u”, *((short*)(f+200))) // should print 4096-2*metadataSize-200
+        printf("%u\n", *((short*)(f+200))); // should print 4096-2*metadataSize-200
         free (f);
         gettimeofday(&end,NULL);
         runtime[4][j] = end.tv_usec - start.tv_usec;
     }
+
 	for (int i = 0; i < 5; i++) {
         printf("Avg runtime of task %d: %lf microsecs\n", i, calcMean(runtime[i]));
     }

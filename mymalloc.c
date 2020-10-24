@@ -45,7 +45,7 @@ void * mymalloc(size_t size, char* file, int line){
         if (*blockSize >= size && *inUse == 0){
             //if the remaining space in the original blockSize does not have enough space for metadataSize and unused space,
             //allocate the entire blockSize for the data to be inserted
-            if (*blockSize - size - metadataSize <= 0){
+            if (*blockSize - (long)size - (long)metadataSize <= 0){
                 return insertData(ptr, *blockSize);
             }
             return insertData(ptr, size);
@@ -85,15 +85,15 @@ void myfree(void* ptr, char* file, int line){
     char* traversePtr = myBlock;
     char* prev = NULL;
     while (traversePtr != NULL){
-        char* inUse = traversePtr + 1;
+        char* inUse = traversePtr + sizeof(short);
         short blockSize = *((short*)traversePtr);
         if (inUse + 1 == ptr && *inUse != 0){
             *inUse = 0;
-            mergeFragments(prev, ptr, nextMeta(traversePtr, blockSize));
+            mergeFragments(prev, traversePtr, nextMeta(traversePtr, blockSize));
             return;
         }
         //freeing unused memory
-        else if(*inUse == 0){
+        else if(*inUse == 0 && inUse + 1 == ptr){
             break;
             //error
         }
