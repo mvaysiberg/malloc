@@ -90,10 +90,10 @@ int main(int argc, char* argv[]) {
         //printf(“%u”, *((short*)(f+200))); //should print 400+ metadataSize
 
         //test insert with newly freed space
-        char* j malloc(300 + metadataSize);
+        char* k = malloc(300 + metadataSize);
         //printf(“%u”, *((short*)(f+200))); //should print 300+ metadataSize
 
-        free(j); // right merge 
+        free(k); // right merge 
         //printf(“%u”, *((short*)(f+200))); //should print 400 + metadataSize
 
         free(i); // left and right merge
