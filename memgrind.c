@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <string.h>
 #include "mymalloc.h"
 
 double calcMean(long runtime[]) {
@@ -18,6 +19,7 @@ int main(int argc, char* argv[]) {
     for(int j = 0; j < 50; j++) {
     
         //A Workload
+        printf("A workload\n");
         gettimeofday(&start,NULL);
         for(int i = 0; i < 120; i++) {
             char* c = malloc(sizeof(char));
@@ -27,6 +29,7 @@ int main(int argc, char* argv[]) {
         runtime[0][j] = end.tv_usec - start.tv_usec;
         
         //B Workload
+        printf("B workload\n");
         gettimeofday(&start,NULL);
         char* arr[120];
         for(int i = 0; i < 120; i++) {
@@ -39,6 +42,7 @@ int main(int argc, char* argv[]) {
         runtime[1][j] = end.tv_usec - start.tv_usec;
 
         //C Workload
+        printf("C workload\n");
         gettimeofday(&start,NULL);
         int numMalloc = 0;
         int numFree = 0;
@@ -65,6 +69,7 @@ int main(int argc, char* argv[]) {
         runtime[2][j] = end.tv_usec - start.tv_usec;
 
         //D Workload
+        printf("D workload\n");
         gettimeofday(&start,NULL);
         char* d = malloc(4096 - metadataSize - 1);
         //D error: Saturation of dynamic memory
@@ -79,12 +84,26 @@ int main(int argc, char* argv[]) {
         gettimeofday(&end,NULL);
         runtime[3][j] = end.tv_usec - start.tv_usec;
 
+        //malloc and creates a new metadata for free space
+        char* x = malloc(4000);
+        //malloc and there is not enough space for new metadata so the leftover space if given to the user
+        char* z = malloc(88);
+        //user should not expect this behavior as normally this would segfault, but we give them enough space since we don't make a new metadata
+        z[89] = 'a';
+        printf("%c\n", z[89]);
+        free(x);
+        free(z);
+
         //E Workload
+        printf("E workload\n");
         gettimeofday(&start,NULL);
         char* f = malloc(200);
         char* g = malloc(200);
         char* h = malloc(200);
         char* i = malloc(200);
+        
+        char string[] = "hello";
+        memcpy(f, string, 6);
 
         free(g);
         free(h); // left merge
@@ -99,6 +118,10 @@ int main(int argc, char* argv[]) {
 
         free(i); // left and right merge
         printf("%u\n", *((short*)(f+200))); // should print 4096-2*metadataSize-200
+        
+        //All the merges do not interfere with data in f as it still prints hello
+        printf("%s\n", f);
+
         free (f);
         gettimeofday(&end,NULL);
         runtime[4][j] = end.tv_usec - start.tv_usec;
