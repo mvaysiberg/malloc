@@ -53,7 +53,7 @@ void * mymalloc(size_t size, char* file, int line){
         ptr = nextMeta(ptr, *blockSize);
     }
     //could not find a block with enough space
-    printf("Out of space on line %d in file %s", line, file);
+    printf("Out of space on line %d in file %s\n", line, file);
     return NULL;
 }
 
@@ -103,5 +103,5 @@ void myfree(void* ptr, char* file, int line){
         }
     }
     //did not find pointer in memory
-    printf("Free error on line %d in file %s", line, file);
+    printf("Free error on line %d in file %s\n", line, file);
 }

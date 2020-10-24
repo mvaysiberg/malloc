@@ -14,7 +14,7 @@ double calcMean(long runtime[]) {
 int main(int argc, char* argv[]) {
 	struct timeval start, end;
 	long runtime[5][50];
-    for(int j = 0; j < 50; j++) {
+    for(int j = 0; j < 1; j++) { //change to 50
         //A Workload
         gettimeofday(&start,NULL);
         for(int i = 0; i < 120; i++) {
@@ -103,6 +103,6 @@ int main(int argc, char* argv[]) {
         runtime[4][j] = end.tv_usec - start.tv_usec;
     }
 	for (int i = 0; i < 5; i++) {
-        printf("Avg runtime of task %d: %lf microsecs", i, calcMean(runtime[i]));
+        printf("Avg runtime of task %d: %lf microsecs\n", i, calcMean(runtime[i]));
     }
 }
