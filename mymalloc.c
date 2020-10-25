@@ -4,7 +4,9 @@
 
 static const size_t metadataSize = sizeof(short) + 1;
 static char myBlock[4096];
-//Finds the pointer to the beginning of the next block's metadata
+//Locates the next block's metadata
+//It is assumed that start != NULL and points to the beginning of a block's meta data (guaranteed by mymalloc)
+//If there is no next block, the function returns NULL
 char* nextMeta(char* start, size_t size){
     //start points to the metadata of the last block
     if (start + metadataSize + size >= myBlock + 4096){ 
@@ -13,6 +15,7 @@ char* nextMeta(char* start, size_t size){
     return start + metadataSize + size;
 }
 //Creates metadata for block
+//It is assumed that start is a valid pointer to metadata inside myBlock (guaranteed by insertData) and use is either 0 or 1
 void insertMetadata(char* start, size_t size, char use){
     short* blockSize = (short*)start;
     *blockSize = size;
@@ -20,6 +23,7 @@ void insertMetadata(char* start, size_t size, char use){
     *inUse = use;
 }
 //Creates a new block
+//It is assumed start is a valid pointer to metadata inside myBlock (guaranteed by myMalloc) and size <= unused space in myBlock (guaranteed by myMalloc)
 void* insertData(char* start, size_t size){
     short* blockSize = (short*)start;
     //inserting metadata for leftover unused space after allocating enough for the insert block
@@ -30,6 +34,8 @@ void* insertData(char* start, size_t size){
     return start + metadataSize;
 }
 //Returns a contiguous block of memory of size (size)
+//No assumptions about the parameters were made
+//If there is no unused block with space >= size, an error is printed out to stdout
 void * mymalloc(size_t size, char* file, int line){
     static int init = 0;
     if (!init){
@@ -57,12 +63,14 @@ void * mymalloc(size_t size, char* file, int line){
     return NULL;
 }
 //Merges an used block with an used block located directly on its left side
+//It is assumed cur points to the beginning of a block's metadata(guaranteed by mergeFragments) and prev points to the beginning of the previous block's metadata(guaranteed by mergeFragments)
 void mergeLeft(char* prev, char* cur){
     short* prevSize = (short*)prev;
     short* curSize = (short*)cur;
     *prevSize += *curSize + metadataSize;
 }
-//Merges the current block with blocks direclty on its left and right if they are not being used
+//Merges the current block with blocks directly on its left and right if they are not being used
+//It is assumed that cur points to the beginning of a block's metadata(guaranteed by myFree) and if prev or next are not NULL they point to the metadata of the previous and next block respectively
 void mergeFragments(char* prev, char* cur, char* next){
     char prevInUse = (prev != NULL)? *(prev + sizeof(short)): 1;
     char nextInUse = (next != NULL)? *(next + sizeof(short)): 1;
@@ -81,6 +89,8 @@ void mergeFragments(char* prev, char* cur, char* next){
     }
 }
 //Frees a block of data that was obtained from mymalloc
+//No assumptions were made about the parameters
+//If ptr does not point to the beginning of a block, an error is printed out to stdout
 void myfree(void* ptr, char* file, int line){
     char* traversePtr = myBlock;
     char* prev = NULL;
