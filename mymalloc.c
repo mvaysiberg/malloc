@@ -4,7 +4,7 @@
 
 static const size_t metadataSize = sizeof(short) + 1;
 static char myBlock[4096];
-
+//Finds the pointer to the beginning of the next block's metadata
 char* nextMeta(char* start, size_t size){
     //start points to the metadata of the last block
     if (start + metadataSize + size >= myBlock + 4096){ 
@@ -12,14 +12,14 @@ char* nextMeta(char* start, size_t size){
     }
     return start + metadataSize + size;
 }
-
+//Creates metadata for block
 void insertMetadata(char* start, size_t size, char use){
     short* blockSize = (short*)start;
     *blockSize = size;
     char* inUse = (char*)(blockSize + 1);
     *inUse = use;
 }
-
+//Creates a new block
 void* insertData(char* start, size_t size){
     short* blockSize = (short*)start;
     //inserting metadata for leftover unused space after allocating enough for the insert block
@@ -29,7 +29,7 @@ void* insertData(char* start, size_t size){
     insertMetadata(start, size, 1);
     return start + metadataSize;
 }
-
+//Returns a contiguous block of memory of size (size)
 void * mymalloc(size_t size, char* file, int line){
     static int init = 0;
     if (!init){
@@ -56,13 +56,13 @@ void * mymalloc(size_t size, char* file, int line){
     printf("Out of space on line %d in file %s\n", line, file);
     return NULL;
 }
-
+//Merges an used block with an used block located directly on its left side
 void mergeLeft(char* prev, char* cur){
     short* prevSize = (short*)prev;
     short* curSize = (short*)cur;
     *prevSize += *curSize + metadataSize;
 }
-
+//Merges the current block with blocks direclty on its left and right if they are not being used
 void mergeFragments(char* prev, char* cur, char* next){
     char prevInUse = (prev != NULL)? *(prev + sizeof(short)): 1;
     char nextInUse = (next != NULL)? *(next + sizeof(short)): 1;
@@ -80,7 +80,7 @@ void mergeFragments(char* prev, char* cur, char* next){
         mergeLeft(cur, next);
     }
 }
-
+//Frees a block of data that was obtained from mymalloc
 void myfree(void* ptr, char* file, int line){
     char* traversePtr = myBlock;
     char* prev = NULL;
