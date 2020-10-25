@@ -81,9 +81,6 @@ int main(int argc, char* argv[]) {
         //C error: Redundant free()ing of the same pointer
         free(d);
         free(d);
-        gettimeofday(&end,NULL);
-        runtime[3][j] = end.tv_usec - start.tv_usec;
-
         //malloc and creates a new metadata for free space
         char* x = malloc(4000);
         //malloc and there is not enough space for new metadata so the leftover space if given to the user
@@ -97,6 +94,8 @@ int main(int argc, char* argv[]) {
         char* z = malloc(0);
         free(z);
 
+        gettimeofday(&end,NULL);
+        runtime[3][j] = end.tv_usec - start.tv_usec;
         //E Workload
         printf("E workload\n");
         gettimeofday(&start,NULL);
@@ -110,17 +109,17 @@ int main(int argc, char* argv[]) {
 
         free(g);
         free(h); // left merge
-        printf("%u\n", *((short*)(f+200))); //should print 400+ metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 403
 
         //test insert with newly freed space
         char* k = malloc(300 + metadataSize);
-        printf("%u\n", *((short*)(f+200))); //should print 300+ metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 303
 
         free(k); // right merge 
-        printf("%u\n", *((short*)(f+200))); //should print 400 + metadataSize
+        printf("%u\n", *((short*)(f+200))); //should print 403
 
         free(i); // left and right merge
-        printf("%u\n", *((short*)(f+200))); // should print 4096-2*metadataSize-200
+        printf("%u\n", *((short*)(f+200))); // should print 3890
         
         //All the merges do not interfere with data in f as it still prints hello
         printf("%s\n", f);

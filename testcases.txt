@@ -1,0 +1,15 @@
+Workload D:
+In this workload we test the various error conditions and the malloc case where there is not enough space to create another metadata.
+We malloc a size where there is not enough room for a new metadata block, so the entire myBlock is given to char* d.
+As there is no more empty space, mallocing char* e throws a saturation of dynamic memory error.
+Then we test freeing an address that is not a pointer ((int*)20).
+Since e was not allocated, attempting to free e will produce the pointer not allocated by malloc error.
+Freeing d after it was already freed will be a redundant freeing of the same pointer.
+After mallocing char* x, there is enough space for a new metadata, but after mallocing char* y there is not enough space, so all of the remaining free space is given to y.
+To show that we gave the remaining space, we assign memory outside of what was requested and show that it does not segfault.
+Finally, we malloc(0) which throws an error and then try to free the pointer which was not given memory.
+
+Workload E:
+In this workload we test the different merges and check that other data remains unaffected.
+We first do a left merge, then insert data into the newly freed space, a right merge, and a left-right merge.
+We print the size of the remaining free block to check that merging was successful.
