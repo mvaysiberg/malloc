@@ -87,11 +87,14 @@ int main(int argc, char* argv[]) {
         //malloc and creates a new metadata for free space
         char* x = malloc(4000);
         //malloc and there is not enough space for new metadata so the leftover space if given to the user
-        char* z = malloc(88);
+        char* y = malloc(88);
         //user should not expect this behavior as normally this would segfault, but we give them enough space since we don't make a new metadata
-        z[89] = 'a';
-        printf("%c\n", z[89]);
+        y[89] = 'a';
+        printf("%c\n", y[89]);
         free(x);
+        free(y);
+        //malloc 0 return null
+        char* z = malloc(0);
         free(z);
 
         //E Workload
