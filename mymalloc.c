@@ -47,7 +47,7 @@ void * mymalloc(size_t size, char* file, int line){
     }
     //User requests block with size 0
     if (size == 0){
-        printf("Mallocing size 0\n");
+        printf("Mallocing size 0 on line %d in file %s\n", line, file);
         return NULL;
     }
     char* ptr = myBlock;
