@@ -35,13 +35,18 @@ void* insertData(char* start, size_t size){
 }
 //Returns a contiguous block of memory of size (size)
 //No assumptions about the parameters were made
-//If there is no unused block with space >= size, an error is printed out to stdout
+//If there is no unused block with space >= size or if size == 0, an error is printed out to stdout
 void * mymalloc(size_t size, char* file, int line){
     static int init = 0;
     if (!init){
         //initialize metadata when empty
         insertMetadata(myBlock, 4096-metadataSize, 0);
         init = 1;
+    }
+    //User requests block with size 0
+    if (size == 0){
+        printf("Mallocing size 0\n");
+        return NULL;
     }
     char* ptr = myBlock;
     while (ptr != NULL){
